@@ -21,8 +21,32 @@ Current repo contents:
 - `docs/design-seed.md` captures the first architecture seed.
 - `prototype/pyramid-console.html` is a self-contained interactive mockup.
 
-Near-term goal:
-Turn this design seed into a concrete implementation plan for the first vertical slice:
+Immediate next goal:
+Continue the visualization work first. Do not jump straight into CLI/database implementation.
+
+The current prototype in `prototype/pyramid-console.html` is a rough interactive mockup, not an approved final direction. The next Codex session should start by running and inspecting it, then iterate with the user until the Pyramid console visual design is satisfying.
+
+Start here:
+
+```bash
+npm run preview
+```
+
+Open:
+
+```text
+http://127.0.0.1:61777/pyramid-console.html
+```
+
+Visual work acceptance bar:
+- the console should feel like a beautiful, serious local operations surface, not a dressed-up wireframe;
+- the hierarchy graph should be immediately legible and visually central;
+- selected-node self-context should feel essential and easy to scan;
+- topology policy, allowed routes, blocked routes, receipts, and replay should read as one coherent product surface;
+- interactions should be meaningful enough to evaluate the product concept;
+- the user must explicitly say the visual direction is good enough before moving on.
+
+Only after the user approves the visual direction, turn this design seed into a concrete implementation plan for the first vertical slice:
 
 root manager
   -> speaker-manager
@@ -38,6 +62,5 @@ The first slice should prove:
 - every node has a working self-context JSON command;
 - a local web visualization reads the ledger and shows the hierarchy, selected-node context, allowed/blocked routes, and receipts.
 
-Please inspect the repo, then propose the smallest implementation plan. Prefer a conservative TypeScript/Node CLI plus SQLite ledger unless local repo evidence suggests another better starting point.
+Please inspect the repo, run the prototype, and begin by improving the visualization with the user. Once the user approves the visual direction, propose the smallest implementation plan. Prefer a conservative TypeScript/Node CLI plus SQLite ledger unless local repo evidence suggests another better starting point.
 ```
-
