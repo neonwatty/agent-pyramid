@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pyramid Console v5</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #101828;
+      --muted: #667085;
+      --panel: #ffffff;
+      --line: #d6dfeb;
+      --soft: #f4f7fb;
+      --map: #edf3f8;
+      --blue: #2563eb;
+      --cyan: #0891b2;
+      --green: #16a34a;
+      --amber: #d97706;
+      --red: #dc2626;
+      --shadow: 0 18px 48px rgba(15, 23, 42, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(37, 99, 235, 0.10), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(8, 145, 178, 0.09), transparent 28%),
+        #f6f8fb;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page {
+      width: min(1500px, calc(100vw - 48px));
+      margin: 28px auto 40px;
+    }
+
+    .intro {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    .intro h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .intro p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .receipt-strip {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .receipt-chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #344054;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .app {
+      overflow: hidden;
+      border: 1px solid #cbd6e5;
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 250px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 15px 18px;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .brand span,
+    .run-health {
+      color: #c5cfdd;
+      font-size: 12px;
+    }
+
+    .search {
+      border: 1px solid rgba(203, 213, 225, 0.24);
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: #121c30;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .run-health {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(640px, 1fr) 360px;
+      min-height: 760px;
+    }
+
+    .sidebar,
+    .inspector {
+      padding: 16px;
+      background: #f8fafc;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+    }
+
+    .inspector {
+      border-left: 1px solid var(--line);
+    }
+
+    .section-label {
+      margin: 0 0 9px;
+      color: #667085;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .card,
+    .nav-item,
+    .detail-card,
+    .event {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+    }
+
+    .card {
+      padding: 13px;
+      margin-bottom: 16px;
+    }
+
+    .card h2,
+    .detail-card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .card p,
+    .detail-card p,
+    .event p {
+      margin: 0;
+      color: #52637a;
+      font-size: 12px;
+      line-height: 1.48;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      border-radius: 8px;
+      padding: 9px;
+      background: #eef2f7;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 19px;
+    }
+
+    .stat span {
+      color: #52637a;
+      font-size: 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 11px;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .nav-item.is-active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .nav-icon {
+      display: grid;
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 8px;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .nav-item b {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .nav-item span {
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .map {
+      position: relative;
+      padding: 20px 24px 150px;
+      background:
+        linear-gradient(rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+        var(--map);
+      background-size: 28px 28px;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .map-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .view-note {
+      margin-top: 4px;
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .legend span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #344054;
+      font-size: 12px;
+    }
+
+    .legend .warn {
+      border-color: #f59e0b;
+      color: #92400e;
+      background: #fffbeb;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 470px;
+    }
+
+    .links {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .link-label {
+      fill: #52637a;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .node {
+      position: absolute;
+      width: 190px;
+      min-height: 132px;
+      border: 1px solid #c8d4e2;
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .node:hover,
+    .node.is-selected {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.16), 0 10px 24px rgba(15, 23, 42, 0.10);
+      transform: translateY(-2px);
+    }
+
+    .node.root {
+      border-color: var(--blue);
+    }
+
+    .node[data-id="root"] { left: calc(50% - 95px); top: 8px; }
+    .node[data-id="speaker-manager"] { left: calc(26% - 95px); top: 160px; }
+    .node[data-id="boundary-judge"] { left: calc(74% - 95px); top: 160px; }
+    .node[data-id="route-scout"] { left: calc(14% - 95px); top: 330px; }
+    .node[data-id="proof-worker"] { left: calc(42% - 95px); top: 330px; }
+    .node[data-id="receipt-packager"] { left: calc(70% - 95px); top: 330px; }
+
+    .node-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .role {
+      color: #667085;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .status.waiting {
+      background: var(--amber);
+    }
+
+    .node h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .node p {
+      margin: 0;
+      min-height: 40px;
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.38;
+    }
+
+    .pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 7px;
+      background: #eef2f7;
+      color: #475467;
+      font-size: 11px;
+    }
+
+    .pill.warn {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+
+    .dock {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .event {
+      padding: 11px;
+    }
+
+    .event b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .detail-card {
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .detail-card.selected-summary {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.12);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 6px 10px;
+      margin-top: 10px;
+      color: #52637a;
+      font-size: 12px;
+    }
+
+    .kv b {
+      color: #344054;
+    }
+
+    .code {
+      overflow: auto;
+      margin-top: 9px;
+      border-radius: 8px;
+      padding: 10px;
+      background: #0f172a;
+      color: #dbeafe;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      white-space: pre;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .action {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 9px;
+      background: #ffffff;
+      color: #344054;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1200px) {
+      .page {
+        width: min(980px, calc(100vw - 28px));
+      }
+
+      .intro,
+      .topbar,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .intro {
+        display: block;
+      }
+
+      .receipt-strip {
+        justify-content: flex-start;
+        margin-top: 12px;
+      }
+
+      .sidebar,
+      .inspector {
+        border: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .stage {
+        min-height: 760px;
+      }
+
+      .node {
+        left: 50% !important;
+        transform: translateX(-50%);
+      }
+
+      .node:hover,
+      .node.is-selected {
+        transform: translateX(-50%) translateY(-2px);
+      }
+
+      .node[data-id="root"] { top: 0; }
+      .node[data-id="speaker-manager"] { top: 145px; }
+      .node[data-id="boundary-judge"] { top: 290px; }
+      .node[data-id="route-scout"] { top: 435px; }
+      .node[data-id="proof-worker"] { top: 580px; }
+      .node[data-id="receipt-packager"] { top: 725px; }
+
+      .links {
+        display: none;
+      }
+
+      .dock {
+        position: static;
+        grid-template-columns: 1fr;
+        margin-top: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="intro">
+      <div>
+        <h1>Pyramid Console v5</h1>
+        <p>A standalone local web server for auditing a live Codex app hierarchy. The graph is the primary object: click a node and the console explains identity, authority, current work, allowed routes, and receipts.</p>
+      </div>
+      <div class="receipt-strip">
+        <span class="receipt-chip">visible Codex app sessions</span>
+        <span class="receipt-chip">ledger-routed messages</span>
+        <span class="receipt-chip">topology enforced</span>
+      </div>
+    </header>
+
+    <main class="app">
+      <div class="topbar">
+        <div class="brand">
+          <strong>Pyramid</strong>
+          <span>.pyramid/pyramid.db</span>
+        </div>
+        <div class="search">Search nodes, tasks, receipts, thread titles...</div>
+        <div class="run-health"><span class="live-dot"></span> Dispatch connected | 6 nodes | 1 blocked route</div>
+      </div>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <p class="section-label">Run</p>
+          <div class="card">
+            <h2>sim-lab-confidence</h2>
+            <p>Prove the speaker workflow atlas is ready for manager review without leaking auth-state contents.</p>
+            <div class="stat-grid">
+              <div class="stat"><b>6</b><span>nodes</span></div>
+              <div class="stat"><b>4</b><span>routed edges</span></div>
+              <div class="stat"><b>12</b><span>receipts</span></div>
+              <div class="stat"><b>1</b><span>blocked route</span></div>
+            </div>
+          </div>
+
+          <p class="section-label">Lens</p>
+          <button class="nav-item is-active" data-view="hierarchy">
+            <span class="nav-icon">H</span>
+            <span><b>Hierarchy</b><span>Manager, worker, and judge relationships.</span></span>
+          </button>
+          <button class="nav-item" data-view="topology">
+            <span class="nav-icon">T</span>
+            <span><b>Topology Policy</b><span>Who may talk to whom, and why.</span></span>
+          </button>
+          <button class="nav-item" data-view="evidence">
+            <span class="nav-icon">E</span>
+            <span><b>Evidence</b><span>Receipts attached to nodes and claims.</span></span>
+          </button>
+          <button class="nav-item" data-view="replay">
+            <span class="nav-icon">R</span>
+            <span><b>Replay</b><span>Chronological dispatch and audit trail.</span></span>
+          </button>
+        </aside>
+
+        <section class="map">
+          <div class="map-header">
+            <div>
+              <h2 id="map-title">Live Hierarchy</h2>
+              <div class="view-note" id="map-note">Solid lines are allowed reporting routes. The dashed red line is a denied worker-to-worker route.</div>
+            </div>
+            <div class="legend">
+              <span>root manager</span>
+              <span>child manager</span>
+              <span>independent judge</span>
+              <span class="warn">policy block</span>
+            </div>
+          </div>
+
+          <div class="stage">
+            <svg class="links" viewBox="0 0 820 470" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M410 75 C320 145 260 145 215 188" fill="none" stroke="#8fa1b8" stroke-width="2.4" />
+              <path d="M410 75 C505 145 560 145 610 188" fill="none" stroke="#8fa1b8" stroke-width="2.4" />
+              <path d="M215 292 C160 320 120 335 95 376" fill="none" stroke="#8fa1b8" stroke-width="2.4" />
+              <path d="M215 292 C280 325 325 342 345 376" fill="none" stroke="#8fa1b8" stroke-width="2.4" />
+              <path d="M610 292 C560 325 525 342 575 376" fill="none" stroke="#8fa1b8" stroke-width="2.4" />
+              <path d="M345 395 C430 340 520 342 575 395" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-dasharray="9 8" />
+            </svg>
+
+            <article class="node root is-selected" data-id="root">
+              <div class="node-top"><span class="role">Root Manager</span><span class="status"></span></div>
+              <h3>atlas-root</h3>
+              <p>Owns the run objective, creates child managers, and gates final completion.</p>
+              <div class="pills"><span class="pill">final gate</span><span class="pill">can delegate</span></div>
+            </article>
+
+            <article class="node" data-id="speaker-manager">
+              <div class="node-top"><span class="role">Manager</span><span class="status waiting"></span></div>
+              <h3>speaker-manager</h3>
+              <p>Coordinates speaker-route work, asks for proof, and rolls up to root.</p>
+              <div class="pills"><span class="pill">2 children</span><span class="pill warn">1 unread</span></div>
+            </article>
+
+            <article class="node" data-id="boundary-judge">
+              <div class="node-top"><span class="role">Judge</span><span class="status"></span></div>
+              <h3>boundary-judge</h3>
+              <p>Reviews boundary evidence independently, without worker context leakage.</p>
+              <div class="pills"><span class="pill">isolated</span><span class="pill">reviewer</span></div>
+            </article>
+
+            <article class="node" data-id="route-scout">
+              <div class="node-top"><span class="role">Worker</span><span class="status"></span></div>
+              <h3>route-scout</h3>
+              <p>Maps route expectations, missing screenshots, and manifest gaps.</p>
+              <div class="pills"><span class="pill">working</span></div>
+            </article>
+
+            <article class="node" data-id="proof-worker">
+              <div class="node-top"><span class="role">Worker</span><span class="status waiting"></span></div>
+              <h3>proof-worker</h3>
+              <p>Waits for accepted adversarial criteria before running proof.</p>
+              <div class="pills"><span class="pill">waiting</span></div>
+            </article>
+
+            <article class="node" data-id="receipt-packager">
+              <div class="node-top"><span class="role">Worker</span><span class="status"></span></div>
+              <h3>receipt-packager</h3>
+              <p>Turns verified claims into a replayable handoff and receipt pack.</p>
+              <div class="pills"><span class="pill">ready</span></div>
+            </article>
+          </div>
+
+          <div class="dock">
+            <div class="event"><b>Latest receipt</b><p>route-scout reported 4 route expectations with screenshot ids.</p></div>
+            <div class="event"><b>Policy event</b><p>worker-to-worker message blocked; workers may message parent only.</p></div>
+            <div class="event"><b>Next rollup</b><p>speaker-manager must request missing proof, then report to atlas-root.</p></div>
+          </div>
+        </section>
+
+        <aside class="inspector">
+          <p class="section-label">Selected Node</p>
+          <div class="detail-card selected-summary">
+            <h3 id="detail-name">atlas-root</h3>
+            <p id="detail-summary">Owns the run objective, creates child managers, and gates final completion.</p>
+            <div class="kv">
+              <b>Role</b><span id="detail-role">Root Manager</span>
+              <b>Parent</b><span id="detail-parent">operator</span>
+              <b>Children</b><span id="detail-children">speaker-manager, boundary-judge</span>
+              <b>May message</b><span id="detail-routes">children, operator</span>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <h3>Self-context</h3>
+            <p>The command every node can run to understand itself and its place.</p>
+            <div class="code" id="detail-code">pyramid context --self --json
+{
+  "node": "atlas-root",
+  "role": "root-manager",
+  "parent": "operator",
+  "children": ["speaker-manager", "boundary-judge"],
+  "may_message": ["children", "operator"],
+  "may_finish": true
+}</div>
+          </div>
+
+          <div class="detail-card">
+            <h3>Allowed Actions</h3>
+            <p id="detail-actions-text">Create child manager, read rollups, request judge review, finish run after evidence gates pass.</p>
+            <div class="actions" id="detail-actions">
+              <span class="action">create child</span>
+              <span class="action">request review</span>
+              <span class="action">finish run</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const nodes = {
+      "root": {
+        name: "atlas-root",
+        role: "Root Manager",
+        roleKey: "root-manager",
+        parent: "operator",
+        children: "speaker-manager, boundary-judge",
+        routes: "children, operator",
+        finish: true,
+        summary: "Owns the run objective, creates child managers, and gates final completion.",
+        actionsText: "Create child manager, read rollups, request judge review, finish run after evidence gates pass.",
+        actions: ["create child", "request review", "finish run"]
+      },
+      "speaker-manager": {
+        name: "speaker-manager",
+        role: "Manager",
+        roleKey: "manager",
+        parent: "atlas-root",
+        children: "route-scout, proof-worker",
+        routes: "parent, children",
+        finish: false,
+        summary: "Coordinates speaker-route work, asks for proof, and rolls up to root.",
+        actionsText: "Consume child inbox, nudge child, record evidence review, roll up to parent, request escalation.",
+        actions: ["consume inbox", "nudge child", "roll up"]
+      },
+      "boundary-judge": {
+        name: "boundary-judge",
+        role: "Judge",
+        roleKey: "judge",
+        parent: "atlas-root",
+        children: "receipt-packager",
+        routes: "parent, assigned worker",
+        finish: false,
+        summary: "Reviews boundary evidence independently, without worker context leakage.",
+        actionsText: "Read assigned evidence, mark accepted or rejected, request additional proof, report to parent.",
+        actions: ["review evidence", "reject claim", "report verdict"]
+      },
+      "route-scout": {
+        name: "route-scout",
+        role: "Worker",
+        roleKey: "worker",
+        parent: "speaker-manager",
+        children: "none",
+        routes: "parent only",
+        finish: false,
+        summary: "Maps route expectations, missing screenshots, and manifest gaps.",
+        actionsText: "Poll worker inbox, run assigned scan, attach receipt, notify manager.",
+        actions: ["poll inbox", "attach receipt", "notify parent"]
+      },
+      "proof-worker": {
+        name: "proof-worker",
+        role: "Worker",
+        roleKey: "worker",
+        parent: "speaker-manager",
+        children: "none",
+        routes: "parent only",
+        finish: false,
+        summary: "Waits for accepted adversarial criteria before running proof.",
+        actionsText: "Wait for accepted criterion, run proof command, attach adversarial result.",
+        actions: ["wait", "run proof", "attach result"]
+      },
+      "receipt-packager": {
+        name: "receipt-packager",
+        role: "Worker",
+        roleKey: "worker",
+        parent: "boundary-judge",
+        children: "none",
+        routes: "parent only",
+        finish: false,
+        summary: "Turns verified claims into a replayable handoff and receipt pack.",
+        actionsText: "Collect accepted receipts, write handoff, notify judge.",
+        actions: ["collect receipts", "write handoff", "notify parent"]
+      }
+    };
+
+    const viewNotes = {
+      hierarchy: ["Live Hierarchy", "Solid lines are allowed reporting routes. The dashed red line is a denied worker-to-worker route."],
+      topology: ["Topology Policy", "The graph emphasizes communication authority: parent-child routes are allowed; sibling routes are denied unless explicitly granted."],
+      evidence: ["Evidence Lens", "Receipts are grouped by the node responsible for producing or reviewing the evidence."],
+      replay: ["Replay Lens", "The bottom rail becomes the chronological audit trail for dispatch, inbox consumption, proof, and rollup events."]
+    };
+
+    function selectNode(id) {
+      const data = nodes[id];
+      if (!data) return;
+      document.querySelectorAll(".node").forEach((node) => node.classList.toggle("is-selected", node.dataset.id === id));
+      document.getElementById("detail-name").textContent = data.name;
+      document.getElementById("detail-summary").textContent = data.summary;
+      document.getElementById("detail-role").textContent = data.role;
+      document.getElementById("detail-parent").textContent = data.parent;
+      document.getElementById("detail-children").textContent = data.children;
+      document.getElementById("detail-routes").textContent = data.routes;
+      document.getElementById("detail-actions-text").textContent = data.actionsText;
+      document.getElementById("detail-actions").innerHTML = data.actions.map((action) => `<span class="action">${action}</span>`).join("");
+      document.getElementById("detail-code").textContent = `pyramid context --self --json
+{
+  "node": "${data.name}",
+  "role": "${data.roleKey}",
+  "parent": "${data.parent}",
+  "children": "${data.children}",
+  "may_message": "${data.routes}",
+  "may_finish": ${data.finish}
+}`;
+    }
+
+    document.querySelectorAll(".node").forEach((node) => {
+      node.addEventListener("click", () => selectNode(node.dataset.id));
+    });
+
+    document.querySelectorAll(".nav-item").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("is-active"));
+        button.classList.add("is-active");
+        const [title, note] = viewNotes[button.dataset.view] || viewNotes.hierarchy;
+        document.getElementById("map-title").textContent = title;
+        document.getElementById("map-note").textContent = note;
+      });
+    });
+  </script>
+</body>
+</html>

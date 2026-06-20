@@ -1,0 +1,10 @@
+{
+  "name": "agent-pyramid",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Experimental hierarchy, topology, and visualization layer for Codex app agent coordination.",
+  "scripts": {
+    "preview": "python3 -m http.server 61777 --bind 127.0.0.1 --directory prototype"
+  }
+}
+
